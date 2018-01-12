@@ -9384,17 +9384,96 @@ var _elm_lang$svg$Svg_Events$onMouseMove = _elm_lang$svg$Svg_Events$simpleOn('mo
 var _elm_lang$svg$Svg_Events$onMouseOut = _elm_lang$svg$Svg_Events$simpleOn('mouseout');
 var _elm_lang$svg$Svg_Events$onMouseOver = _elm_lang$svg$Svg_Events$simpleOn('mouseover');
 var _elm_lang$svg$Svg_Events$onMouseUp = _elm_lang$svg$Svg_Events$simpleOn('mouseup');
-var _user$project$Mastermind$replace = F4(
-	function (index, acc, val, lists) {
-		var _p0 = lists;
+var _user$project$Mastermind$est_bien_placer = F2(
+	function (secret, essai) {
+		var _p0 = secret;
 		if (_p0.ctor === '[]') {
+			return {ctor: '_Tuple3', _0: secret, _1: essai, _2: 0};
+		} else {
+			var _p4 = _p0._0;
+			var _p1 = essai;
+			if (_p1.ctor === '[]') {
+				return {ctor: '_Tuple3', _0: secret, _1: essai, _2: 0};
+			} else {
+				var _p3 = _p1._0;
+				var _p2 = A2(_user$project$Mastermind$est_bien_placer, _p0._1, _p1._1);
+				var secretResult = _p2._0;
+				var essaiResult = _p2._1;
+				var bien = _p2._2;
+				return _elm_lang$core$Native_Utils.eq(_p4, _p3) ? {ctor: '_Tuple3', _0: secretResult, _1: essaiResult, _2: bien + 1} : {
+					ctor: '_Tuple3',
+					_0: {ctor: '::', _0: _p4, _1: secretResult},
+					_1: {ctor: '::', _0: _p3, _1: essaiResult},
+					_2: bien
+				};
+			}
+		}
+	});
+var _user$project$Mastermind$drop_mal_placer = F3(
+	function (equal, val, liste) {
+		var _p5 = liste;
+		if (_p5.ctor === '[]') {
 			return {ctor: '[]'};
 		} else {
-			var _p1 = _p0._1;
-			return _elm_lang$core$Native_Utils.eq(index, acc) ? {ctor: '::', _0: val, _1: _p1} : {
+			var _p7 = _p5._1;
+			var _p6 = _p5._0;
+			return A2(equal, val, _p6) ? _p7 : {
 				ctor: '::',
-				_0: _p0._0,
-				_1: A4(_user$project$Mastermind$replace, index, acc + 1, val, _p1)
+				_0: _p6,
+				_1: A3(_user$project$Mastermind$drop_mal_placer, equal, val, _p7)
+			};
+		}
+	});
+var _user$project$Mastermind$drop_mal_placers = F3(
+	function (equal, vals, liste) {
+		var _p8 = vals;
+		if (_p8.ctor === '[]') {
+			return liste;
+		} else {
+			var listDrop = A3(_user$project$Mastermind$drop_mal_placers, equal, _p8._1, liste);
+			return A3(_user$project$Mastermind$drop_mal_placer, equal, _p8._0, listDrop);
+		}
+	});
+var _user$project$Mastermind$est_mal_placer = F2(
+	function (secret, essai) {
+		var secretRes = A3(
+			_user$project$Mastermind$drop_mal_placers,
+			F2(
+				function (x, y) {
+					return _elm_lang$core$Native_Utils.eq(x, y);
+				}),
+			secret,
+			essai);
+		return _elm_lang$core$List$length(secret) - _elm_lang$core$List$length(secretRes);
+	});
+var _user$project$Mastermind$est_valide = function (colonnes) {
+	est_valide:
+	while (true) {
+		var _p9 = colonnes;
+		if (_p9.ctor === '[]') {
+			return true;
+		} else {
+			if (_elm_lang$core$Native_Utils.eq(_p9._0, _elm_lang$core$Maybe$Nothing)) {
+				return false;
+			} else {
+				var _v5 = _p9._1;
+				colonnes = _v5;
+				continue est_valide;
+			}
+		}
+	}
+};
+var _user$project$Mastermind$replace = F4(
+	function (index, acc, val, lists) {
+		var _p10 = lists;
+		if (_p10.ctor === '[]') {
+			return {ctor: '[]'};
+		} else {
+			var _p11 = _p10._1;
+			return _elm_lang$core$Native_Utils.eq(index, acc) ? {ctor: '::', _0: val, _1: _p11} : {
+				ctor: '::',
+				_0: _p10._0,
+				_1: A4(_user$project$Mastermind$replace, index, acc + 1, val, _p11)
 			};
 		}
 	});
@@ -9553,9 +9632,9 @@ var _user$project$Mastermind$couleurs = {
 var _user$project$Mastermind$intToCouleur = function (i) {
 	var expression = _elm_lang$core$List$head(
 		A2(_elm_lang$core$List$drop, i, _user$project$Mastermind$couleurs));
-	var _p2 = expression;
-	if (_p2.ctor === 'Just') {
-		return _p2._0;
+	var _p12 = expression;
+	if (_p12.ctor === 'Just') {
+		return _p12._0;
 	} else {
 		return 'white';
 	}
@@ -9577,6 +9656,17 @@ var _user$project$Mastermind$Resultat = F2(
 	function (a, b) {
 		return {bien: a, mal: b};
 	});
+var _user$project$Mastermind$valider = F2(
+	function (secret, essai) {
+		var _p13 = A2(_user$project$Mastermind$est_bien_placer, secret, essai);
+		var secretA = _p13._0;
+		var essaiA = _p13._1;
+		var bien = _p13._2;
+		return A2(
+			_user$project$Mastermind$Resultat,
+			bien,
+			A2(_user$project$Mastermind$est_mal_placer, secretA, essaiA));
+	});
 var _user$project$Mastermind$Ligne = F2(
 	function (a, b) {
 		return {colonnes: a, resultat: b};
@@ -9590,31 +9680,10 @@ var _user$project$Mastermind$init_parametre = {
 		A2(_elm_lang$core$List$repeat, 4, _elm_lang$core$Maybe$Nothing),
 		_elm_lang$core$Maybe$Nothing)
 };
-var _user$project$Mastermind$Jeu = F5(
-	function (a, b, c, d, e) {
-		return {parametre: a, combinaison_secrete: b, lignes_essai: c, ligne_courante: d, select_couleur: e};
+var _user$project$Mastermind$Jeu = F6(
+	function (a, b, c, d, e, f) {
+		return {parametre: a, combinaison_secrete: b, lignes_essai: c, ligne_courante: d, select_couleur: e, status: f};
 	});
-var _user$project$Mastermind$generation_jeu = function (parametre) {
-	var gabarit = A2(
-		_user$project$Mastermind$Ligne,
-		A2(_elm_lang$core$List$repeat, parametre.nbr_colonne, _elm_lang$core$Maybe$Nothing),
-		_elm_lang$core$Maybe$Nothing);
-	var param = _elm_lang$core$Native_Utils.update(
-		parametre,
-		{gabarit: gabarit});
-	var essai = {ctor: '[]'};
-	var secret = A2(
-		_elm_lang$core$List$repeat,
-		parametre.nbr_colonne,
-		_user$project$Mastermind$intToCouleur(1));
-	return A5(_user$project$Mastermind$Jeu, param, secret, essai, gabarit, _elm_lang$core$Maybe$Nothing);
-};
-var _user$project$Mastermind$init_model = {
-	parametre: _user$project$Mastermind$init_parametre,
-	jeu: _elm_lang$core$Maybe$Just(
-		_user$project$Mastermind$generation_jeu(_user$project$Mastermind$init_parametre))
-};
-var _user$project$Mastermind$init = {ctor: '_Tuple2', _0: _user$project$Mastermind$init_model, _1: _elm_lang$core$Platform_Cmd$none};
 var _user$project$Mastermind$Model = F2(
 	function (a, b) {
 		return {parametre: a, jeu: b};
@@ -9631,8 +9700,8 @@ var _user$project$Mastermind$draw_resultat = F3(
 			position1,
 			{x: position1.x + taille});
 		var balisesResult = function () {
-			var _p3 = result;
-			if (_p3.ctor === 'Just') {
+			var _p14 = result;
+			if (_p14.ctor === 'Just') {
 				return {
 					ctor: '::',
 					_0: A2(
@@ -9713,7 +9782,7 @@ var _user$project$Mastermind$draw_resultat = F3(
 								{
 									ctor: '::',
 									_0: _elm_lang$svg$Svg$text(
-										_elm_lang$core$Basics$toString(_p3._0.bien)),
+										_elm_lang$core$Basics$toString(_p14._0.bien)),
 									_1: {ctor: '[]'}
 								}),
 							_1: {
@@ -9746,7 +9815,7 @@ var _user$project$Mastermind$draw_resultat = F3(
 									{
 										ctor: '::',
 										_0: _elm_lang$svg$Svg$text(
-											_elm_lang$core$Basics$toString(_p3._0.mal)),
+											_elm_lang$core$Basics$toString(_p14._0.mal)),
 										_1: {ctor: '[]'}
 									}),
 								_1: {ctor: '[]'}
@@ -9767,8 +9836,8 @@ var _user$project$Mastermind$draw_case = F4(
 	function (colonne, attributes, taille, position) {
 		var pos = A2(_user$project$Mastermind$Position, position.x + ((taille / 2) | 0), position.y + ((taille / 2) | 0));
 		var contenu = function () {
-			var _p4 = colonne;
-			if (_p4.ctor === 'Just') {
+			var _p15 = colonne;
+			if (_p15.ctor === 'Just') {
 				var rayon = _elm_lang$core$Basics$round(
 					A2(
 						F2(
@@ -9777,7 +9846,7 @@ var _user$project$Mastermind$draw_case = F4(
 							}),
 						0.4,
 						_elm_lang$core$Basics$toFloat(taille)));
-				return A3(_user$project$Mastermind$draw_pion, _p4._0, rayon, pos);
+				return A3(_user$project$Mastermind$draw_pion, _p15._0, rayon, pos);
 			} else {
 				var rayon = _elm_lang$core$Basics$round(
 					A2(
@@ -9832,6 +9901,77 @@ var _user$project$Mastermind$draw_case = F4(
 					_0: contenu,
 					_1: {ctor: '[]'}
 				}
+			});
+	});
+var _user$project$Mastermind$Defaite = {ctor: 'Defaite'};
+var _user$project$Mastermind$Victoire = {ctor: 'Victoire'};
+var _user$project$Mastermind$EnCour = {ctor: 'EnCour'};
+var _user$project$Mastermind$generation_jeu = function (parametre) {
+	var gabarit = A2(
+		_user$project$Mastermind$Ligne,
+		A2(_elm_lang$core$List$repeat, parametre.nbr_colonne, _elm_lang$core$Maybe$Nothing),
+		_elm_lang$core$Maybe$Nothing);
+	var param = _elm_lang$core$Native_Utils.update(
+		parametre,
+		{gabarit: gabarit});
+	var essai = {ctor: '[]'};
+	var secret = A2(
+		_elm_lang$core$List$repeat,
+		parametre.nbr_colonne,
+		_elm_lang$core$Maybe$Just(
+			_user$project$Mastermind$intToCouleur(1)));
+	return A6(_user$project$Mastermind$Jeu, param, secret, essai, gabarit, _elm_lang$core$Maybe$Nothing, _user$project$Mastermind$EnCour);
+};
+var _user$project$Mastermind$init_model = {
+	parametre: _user$project$Mastermind$init_parametre,
+	jeu: _elm_lang$core$Maybe$Just(
+		_user$project$Mastermind$generation_jeu(_user$project$Mastermind$init_parametre))
+};
+var _user$project$Mastermind$ValiderCourant = {ctor: 'ValiderCourant'};
+var _user$project$Mastermind$draw_valider = F2(
+	function (taille, position) {
+		return A2(
+			_elm_lang$svg$Svg$g,
+			{
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Events$onClick(_user$project$Mastermind$ValiderCourant),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$svg$Svg$rect,
+					{
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$x(
+							_elm_lang$core$Basics$toString(position.x)),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$y(
+								_elm_lang$core$Basics$toString(position.y)),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$width(
+									_elm_lang$core$Basics$toString(taille * 2)),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$height(
+										_elm_lang$core$Basics$toString(taille)),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$svg$Svg_Attributes$fill('green'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$svg$Svg_Attributes$stroke('white'),
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						}
+					},
+					{ctor: '[]'}),
+				_1: {ctor: '[]'}
 			});
 	});
 var _user$project$Mastermind$SelectCouleur = function (a) {
@@ -9917,12 +10057,12 @@ var _user$project$Mastermind$draw_colonne = F5(
 				_user$project$Mastermind$Select(acc)),
 			_1: {ctor: '[]'}
 		} : {ctor: '[]'};
-		var _p5 = colonnes;
-		if (_p5.ctor === '::') {
-			if (_p5._1.ctor === '[]') {
+		var _p16 = colonnes;
+		if (_p16.ctor === '::') {
+			if (_p16._1.ctor === '[]') {
 				return {
 					ctor: '::',
-					_0: A4(_user$project$Mastermind$draw_case, _p5._0, attributes, taille, position),
+					_0: A4(_user$project$Mastermind$draw_case, _p16._0, attributes, taille, position),
 					_1: {ctor: '[]'}
 				};
 			} else {
@@ -9931,10 +10071,10 @@ var _user$project$Mastermind$draw_colonne = F5(
 						function (x, y) {
 							return {ctor: '::', _0: x, _1: y};
 						}),
-					A4(_user$project$Mastermind$draw_case, _p5._0, attributes, taille, position),
+					A4(_user$project$Mastermind$draw_case, _p16._0, attributes, taille, position),
 					A5(
 						_user$project$Mastermind$draw_colonne,
-						_p5._1,
+						_p16._1,
 						isCourant,
 						acc + 1,
 						taille,
@@ -9948,6 +10088,7 @@ var _user$project$Mastermind$draw_colonne = F5(
 	});
 var _user$project$Mastermind$draw_ligne = F4(
 	function (ligne, isCourant, taille, position) {
+		var valide = isCourant && _user$project$Mastermind$est_valide(ligne.colonnes);
 		var lenght = _elm_lang$core$List$length(ligne.colonnes);
 		var pos = _elm_lang$core$Native_Utils.update(
 			position,
@@ -9960,7 +10101,7 @@ var _user$project$Mastermind$draw_ligne = F4(
 					function (x, y) {
 						return {ctor: '::', _0: x, _1: y};
 					}),
-				A3(_user$project$Mastermind$draw_resultat, ligne.resultat, taille, pos),
+				valide ? A2(_user$project$Mastermind$draw_valider, taille, pos) : A3(_user$project$Mastermind$draw_resultat, ligne.resultat, taille, pos),
 				A5(_user$project$Mastermind$draw_colonne, ligne.colonnes, isCourant, 0, taille, position)));
 	});
 var _user$project$Mastermind$draw_plateau_repeat = F5(
@@ -9986,17 +10127,17 @@ var _user$project$Mastermind$draw_plateau_repeat = F5(
 	});
 var _user$project$Mastermind$draw_plateau = F4(
 	function (lignes, isCourant, taille, position) {
-		var _p6 = lignes;
-		if (_p6.ctor === '[]') {
+		var _p17 = lignes;
+		if (_p17.ctor === '[]') {
 			return {ctor: '[]'};
 		} else {
-			var svgLigne = A4(_user$project$Mastermind$draw_ligne, _p6._0, isCourant, taille, position);
+			var svgLigne = A4(_user$project$Mastermind$draw_ligne, _p17._0, isCourant, taille, position);
 			return {
 				ctor: '::',
 				_0: svgLigne,
 				_1: A4(
 					_user$project$Mastermind$draw_plateau,
-					_p6._1,
+					_p17._1,
 					isCourant,
 					taille,
 					_elm_lang$core$Native_Utils.update(
@@ -10008,17 +10149,20 @@ var _user$project$Mastermind$draw_plateau = F4(
 var _user$project$Mastermind$draw_jeu = F3(
 	function (jeu, taille, position) {
 		var positionReste = A2(_user$project$Mastermind$Position, position.x, position.y + taille);
-		var secret = A2(
+		var secret = _elm_lang$core$Native_Utils.eq(jeu.status, _user$project$Mastermind$EnCour) ? A2(
 			_elm_lang$svg$Svg$g,
 			{ctor: '[]'},
-			A3(_user$project$Mastermind$draw_secret, jeu.parametre.nbr_colonne, taille, position));
+			A3(_user$project$Mastermind$draw_secret, jeu.parametre.nbr_colonne, taille, position)) : A2(
+			_elm_lang$svg$Svg$g,
+			{ctor: '[]'},
+			A5(_user$project$Mastermind$draw_colonne, jeu.combinaison_secrete, false, 0, taille, position));
 		var nbrRest = (jeu.parametre.nbr_ligne - _elm_lang$core$List$length(jeu.lignes_essai)) - 2;
 		var reste = A2(
 			_elm_lang$svg$Svg$g,
 			{ctor: '[]'},
 			A5(_user$project$Mastermind$draw_plateau_repeat, jeu.parametre.gabarit, false, nbrRest, taille, positionReste));
 		var positionCourant = A2(_user$project$Mastermind$Position, positionReste.x, positionReste.y + ((nbrRest + 1) * taille));
-		var courant = A2(
+		var courant = _elm_lang$core$Native_Utils.eq(jeu.status, _user$project$Mastermind$EnCour) ? A2(
 			_elm_lang$svg$Svg$g,
 			{ctor: '[]'},
 			A4(
@@ -10030,7 +10174,10 @@ var _user$project$Mastermind$draw_jeu = F3(
 				},
 				true,
 				taille,
-				positionCourant));
+				positionCourant)) : A2(
+			_elm_lang$svg$Svg$g,
+			{ctor: '[]'},
+			{ctor: '[]'});
 		var positionEssai = A2(_user$project$Mastermind$Position, positionCourant.x, positionCourant.y + taille);
 		var essai = (_elm_lang$core$Native_Utils.cmp(
 			_elm_lang$core$List$length(jeu.lignes_essai),
@@ -10063,17 +10210,17 @@ var _user$project$Mastermind$draw_jeu = F3(
 			});
 	});
 var _user$project$Mastermind$plateau = function (jeu) {
-	var _p7 = jeu;
-	if (_p7.ctor === 'Nothing') {
+	var _p18 = jeu;
+	if (_p18.ctor === 'Nothing') {
 		return A2(
 			_elm_lang$svg$Svg$svg,
 			{ctor: '[]'},
 			{ctor: '[]'});
 	} else {
-		var _p8 = _p7._0;
-		var height = _elm_lang$core$Basics$toString((_p8.parametre.nbr_ligne + 1) * 50);
-		var width = _elm_lang$core$Basics$toString((_p8.parametre.nbr_colonne + 2) * 50);
-		return A2(
+		var _p20 = _p18._0;
+		var height = _elm_lang$core$Basics$toString((_p20.parametre.nbr_ligne + 1) * 50);
+		var width = _elm_lang$core$Basics$toString((_p20.parametre.nbr_colonne + 2) * 50);
+		var svgJeu = A2(
 			_elm_lang$svg$Svg$svg,
 			{
 				ctor: '::',
@@ -10099,11 +10246,66 @@ var _user$project$Mastermind$plateau = function (jeu) {
 				ctor: '::',
 				_0: A3(
 					_user$project$Mastermind$draw_jeu,
-					_p8,
+					_p20,
 					50,
 					A2(_user$project$Mastermind$Position, 0, 0)),
 				_1: {ctor: '[]'}
 			});
+		var resultat = function () {
+			var _p19 = _p20.status;
+			switch (_p19.ctor) {
+				case 'Victoire':
+					return A2(
+						_elm_lang$html$Html$div,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$h1,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Victoire'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: svgJeu,
+								_1: {ctor: '[]'}
+							}
+						});
+				case 'Defaite':
+					return A2(
+						_elm_lang$html$Html$div,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$h1,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Defaite'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: svgJeu,
+								_1: {ctor: '[]'}
+							}
+						});
+				default:
+					return A2(
+						_elm_lang$html$Html$div,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: svgJeu,
+							_1: {ctor: '[]'}
+						});
+			}
+		}();
+		return resultat;
 	}
 };
 var _user$project$Mastermind$Secret = function (a) {
@@ -10111,8 +10313,8 @@ var _user$project$Mastermind$Secret = function (a) {
 };
 var _user$project$Mastermind$update = F2(
 	function (msg, model) {
-		var _p9 = msg;
-		switch (_p9.ctor) {
+		var _p21 = msg;
+		switch (_p21.ctor) {
 			case 'Generer':
 				return {
 					ctor: '_Tuple2',
@@ -10128,8 +10330,9 @@ var _user$project$Mastermind$update = F2(
 						_user$project$Mastermind$couleurGenerator(model.parametre))
 				};
 			case 'Secret':
-				var _p10 = model.jeu;
-				if (_p10.ctor === 'Just') {
+				var _p22 = model.jeu;
+				if (_p22.ctor === 'Just') {
+					var combinaison = A2(_elm_lang$core$List$map, _elm_lang$core$Maybe$Just, _p21._0);
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
@@ -10137,8 +10340,8 @@ var _user$project$Mastermind$update = F2(
 							{
 								jeu: _elm_lang$core$Maybe$Just(
 									_elm_lang$core$Native_Utils.update(
-										_p10._0,
-										{combinaison_secrete: _p9._0}))
+										_p22._0,
+										{combinaison_secrete: combinaison}))
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
@@ -10146,14 +10349,14 @@ var _user$project$Mastermind$update = F2(
 					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 				}
 			case 'NbrColonne':
-				var _p11 = model;
-				var parametre = _p11.parametre;
-				var jeu = _p11.jeu;
+				var _p23 = model;
+				var parametre = _p23.parametre;
+				var jeu = _p23.jeu;
 				var value = function () {
-					var _p12 = _elm_lang$core$String$toInt(_p9._0);
-					if (_p12.ctor === 'Ok') {
-						var _p13 = _p12._0;
-						return ((_elm_lang$core$Native_Utils.cmp(_p13, 0) > 0) && (_elm_lang$core$Native_Utils.cmp(_p13, 100) < 0)) ? _p13 : parametre.nbr_colonne;
+					var _p24 = _elm_lang$core$String$toInt(_p21._0);
+					if (_p24.ctor === 'Ok') {
+						var _p25 = _p24._0;
+						return ((_elm_lang$core$Native_Utils.cmp(_p25, 0) > 0) && (_elm_lang$core$Native_Utils.cmp(_p25, 100) < 0)) ? _p25 : parametre.nbr_colonne;
 					} else {
 						return parametre.nbr_colonne;
 					}
@@ -10170,14 +10373,14 @@ var _user$project$Mastermind$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'NbrLigne':
-				var _p14 = model;
-				var parametre = _p14.parametre;
-				var jeu = _p14.jeu;
+				var _p26 = model;
+				var parametre = _p26.parametre;
+				var jeu = _p26.jeu;
 				var value = function () {
-					var _p15 = _elm_lang$core$String$toInt(_p9._0);
-					if (_p15.ctor === 'Ok') {
-						var _p16 = _p15._0;
-						return ((_elm_lang$core$Native_Utils.cmp(_p16, 0) > 0) && (_elm_lang$core$Native_Utils.cmp(_p16, 100) < 0)) ? _p16 : parametre.nbr_ligne;
+					var _p27 = _elm_lang$core$String$toInt(_p21._0);
+					if (_p27.ctor === 'Ok') {
+						var _p28 = _p27._0;
+						return ((_elm_lang$core$Native_Utils.cmp(_p28, 0) > 0) && (_elm_lang$core$Native_Utils.cmp(_p28, 100) < 0)) ? _p28 : parametre.nbr_ligne;
 					} else {
 						return parametre.nbr_ligne;
 					}
@@ -10194,16 +10397,16 @@ var _user$project$Mastermind$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'NbrCouleur':
-				var _p17 = model;
-				var parametre = _p17.parametre;
-				var jeu = _p17.jeu;
+				var _p29 = model;
+				var parametre = _p29.parametre;
+				var jeu = _p29.jeu;
 				var value = function () {
-					var _p18 = _elm_lang$core$String$toInt(_p9._0);
-					if (_p18.ctor === 'Ok') {
-						var _p19 = _p18._0;
-						return ((_elm_lang$core$Native_Utils.cmp(_p19, 1) > 0) && (_elm_lang$core$Native_Utils.cmp(
-							_p19,
-							_elm_lang$core$List$length(_user$project$Mastermind$couleurs)) < 1)) ? _p19 : parametre.nbr_couleur;
+					var _p30 = _elm_lang$core$String$toInt(_p21._0);
+					if (_p30.ctor === 'Ok') {
+						var _p31 = _p30._0;
+						return ((_elm_lang$core$Native_Utils.cmp(_p31, 1) > 0) && (_elm_lang$core$Native_Utils.cmp(
+							_p31,
+							_elm_lang$core$List$length(_user$project$Mastermind$couleurs)) < 1)) ? _p31 : parametre.nbr_couleur;
 					} else {
 						return parametre.nbr_couleur;
 					}
@@ -10220,18 +10423,18 @@ var _user$project$Mastermind$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'Select':
-				var _p20 = model;
-				var parametre = _p20.parametre;
-				var jeu = _p20.jeu;
-				var _p21 = jeu;
-				if (_p21.ctor === 'Just') {
-					var _p23 = _p21._0;
-					var _p22 = _p23;
-					var parametre = _p22.parametre;
-					var combinaison_secrete = _p22.combinaison_secrete;
-					var lignes_essai = _p22.lignes_essai;
-					var ligne_courante = _p22.ligne_courante;
-					var select_couleur = _p22.select_couleur;
+				var _p32 = model;
+				var parametre = _p32.parametre;
+				var jeu = _p32.jeu;
+				var _p33 = jeu;
+				if (_p33.ctor === 'Just') {
+					var _p35 = _p33._0;
+					var _p34 = _p35;
+					var parametre = _p34.parametre;
+					var combinaison_secrete = _p34.combinaison_secrete;
+					var lignes_essai = _p34.lignes_essai;
+					var ligne_courante = _p34.ligne_courante;
+					var select_couleur = _p34.select_couleur;
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
@@ -10239,12 +10442,12 @@ var _user$project$Mastermind$update = F2(
 							{
 								jeu: _elm_lang$core$Maybe$Just(
 									_elm_lang$core$Native_Utils.update(
-										_p23,
+										_p35,
 										{
 											ligne_courante: _elm_lang$core$Native_Utils.update(
 												ligne_courante,
 												{
-													colonnes: A4(_user$project$Mastermind$replace, _p9._0, 0, select_couleur, ligne_courante.colonnes)
+													colonnes: A4(_user$project$Mastermind$replace, _p21._0, 0, select_couleur, ligne_courante.colonnes)
 												})
 										}))
 							}),
@@ -10253,12 +10456,12 @@ var _user$project$Mastermind$update = F2(
 				} else {
 					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 				}
-			default:
-				var _p24 = model;
-				var parametre = _p24.parametre;
-				var jeu = _p24.jeu;
-				var _p25 = jeu;
-				if (_p25.ctor === 'Just') {
+			case 'SelectCouleur':
+				var _p36 = model;
+				var parametre = _p36.parametre;
+				var jeu = _p36.jeu;
+				var _p37 = jeu;
+				if (_p37.ctor === 'Just') {
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
@@ -10266,16 +10469,70 @@ var _user$project$Mastermind$update = F2(
 							{
 								jeu: _elm_lang$core$Maybe$Just(
 									_elm_lang$core$Native_Utils.update(
-										_p25._0,
-										{select_couleur: _p9._0}))
+										_p37._0,
+										{select_couleur: _p21._0}))
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
 					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 				}
+			default:
+				var _p38 = model;
+				var parametre = _p38.parametre;
+				var jeu = _p38.jeu;
+				var _p39 = jeu;
+				if (_p39.ctor === 'Just') {
+					var _p41 = _p39._0;
+					if (_user$project$Mastermind$est_valide(_p41.ligne_courante.colonnes)) {
+						var courant = _p41.ligne_courante;
+						var _p40 = A2(_user$project$Mastermind$valider, _p41.combinaison_secrete, courant.colonnes);
+						var bien = _p40.bien;
+						var mal = _p40.mal;
+						var essais = {
+							ctor: '::',
+							_0: _elm_lang$core$Native_Utils.update(
+								courant,
+								{
+									resultat: _elm_lang$core$Maybe$Just(
+										A2(_user$project$Mastermind$Resultat, bien, mal))
+								}),
+							_1: _p41.lignes_essai
+						};
+						var status = _elm_lang$core$Native_Utils.eq(bien, _p41.parametre.nbr_colonne) ? _user$project$Mastermind$Victoire : ((_elm_lang$core$Native_Utils.cmp(
+							_elm_lang$core$List$length(essais),
+							_p41.parametre.nbr_ligne) > -1) ? _user$project$Mastermind$Defaite : _user$project$Mastermind$EnCour);
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								model,
+								{
+									jeu: _elm_lang$core$Maybe$Just(
+										_elm_lang$core$Native_Utils.update(
+											_p41,
+											{ligne_courante: _p41.parametre.gabarit, lignes_essai: essais, status: status}))
+								}),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+					} else {
+						return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+					}
+				} else {
+					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+				}
 		}
 	});
+var _user$project$Mastermind$init = function () {
+	var model = _user$project$Mastermind$init_model;
+	return {
+		ctor: '_Tuple2',
+		_0: model,
+		_1: A2(
+			_elm_lang$core$Random$generate,
+			_user$project$Mastermind$Secret,
+			_user$project$Mastermind$couleurGenerator(model.parametre))
+	};
+}();
 var _user$project$Mastermind$Generer = {ctor: 'Generer'};
 var _user$project$Mastermind$NbrCouleur = function (a) {
 	return {ctor: 'NbrCouleur', _0: a};
@@ -10407,9 +10664,9 @@ var _user$project$Mastermind$formulaire = function (parametre) {
 };
 var _user$project$Mastermind$view = function (model) {
 	var listCouleurs = function () {
-		var _p26 = model.jeu;
-		if (_p26.ctor === 'Just') {
-			return A2(_elm_lang$core$List$take, _p26._0.parametre.nbr_couleur, _user$project$Mastermind$couleurs);
+		var _p42 = model.jeu;
+		if (_p42.ctor === 'Just') {
+			return A2(_elm_lang$core$List$take, _p42._0.parametre.nbr_couleur, _user$project$Mastermind$couleurs);
 		} else {
 			return {ctor: '[]'};
 		}
